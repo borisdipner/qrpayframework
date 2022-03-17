@@ -16,13 +16,12 @@ import Foundation
         didSet {
             Router.authToken = authToken
         }
-        
     }
+    
     var clientPhone = "" {
         didSet {
             Router.clientPhone = clientPhone
         }
-        
     }
     
     private let manager: SessionManager = {
@@ -36,11 +35,9 @@ import Foundation
         didSet {
             Router.baseUrl = baseUrl
         }
-        
     }
     
     //MARK: - Init
-    
     @objc public override init() {}
     
     @objc public class var sharedInstance: CashierManager {
@@ -50,8 +47,7 @@ import Foundation
         return Singleton.instance
     }
     
-    
-    @objc public init(authToken: String) {  
+    @objc public init(authToken: String) {
         self.authToken = authToken
         self.baseUrl = URL_BASE
         Router.baseUrl = baseUrl
@@ -60,14 +56,14 @@ import Foundation
     
     @objc public init(clientPhone: String) {
         self.clientPhone = clientPhone
-        self.baseUrl = URL_BASE//(mode == .release) ? URL_BASE_RELEASE : URL_BASE_DEBUG
+        self.baseUrl = URL_BASE
         Router.baseUrl = baseUrl
         Router.clientPhone = clientPhone
     }
     
     @objc public init(authToken: String, clientPhone: String) {
         self.clientPhone = clientPhone
-        self.baseUrl = URL_BASE//(mode == .release) ? URL_BASE_RELEASE : URL_BASE_DEBUG
+        self.baseUrl = URL_BASE
         Router.baseUrl = baseUrl
         Router.clientPhone = clientPhone
         self.authToken = authToken
@@ -75,7 +71,6 @@ import Foundation
     }
     
     //MARK: - Login
-    
     @objc public func cashierLogin(login: String, password: String, onSuccess: ((String, NSNumber?) -> Void)? = nil, onError: ((NSError) -> Void)? = nil) {
         let parameters: [String: Any] = [
             "login": login,
@@ -111,7 +106,7 @@ import Foundation
                     var token: String = ""
                     if let t = response.response!.allHeaderFields["Authorization"] as? String {
                         token = t
-                    } 
+                    }
                     print(token)
                     onSuccess?(token, nil)
                 } else {
@@ -149,7 +144,6 @@ import Foundation
     }
     
     //MARK: - Password restore
-    
     @objc public func cashierChangePasswordRequest(login: String, merchantLogin: String, onSuccess: ((String) -> Void)? = nil, onError: ((NSError) -> Void)? = nil) {
         let parameters: [String: Any] = [
             "phone": login,
@@ -219,7 +213,6 @@ import Foundation
     }
     
     //MARK: - History
-    
     @objc public func getHistory(pointId: NSNumber?, cashDeskId: NSNumber?, count: NSNumber? = 99999999, page: NSNumber? = 1, onSuccess: (([History]) -> Void)? = nil, onError: ((NSError) -> Void)? = nil) {
         
         var parameters: [String: Any] = [:]
@@ -265,11 +258,7 @@ import Foundation
     }
     
     @objc public func saveCheckListFromHistory(operationId: Int, onSuccess: ((URL, String) -> Void)? = nil, onError: ((NSError) -> Void)? = nil) {
-//        let url = URL(string: "\(URL_BASE)history/receipt?id=\(operationId)")!
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "GET"
-//        request.setValue(authToken, forHTTPHeaderField: "Authorization")
-//
+        
         var fileName: String?
         var finalPath: URL?
         
@@ -277,9 +266,9 @@ import Foundation
             var directoryURL: URL?
             let urls = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
             if urls.count > 0 {
-                 directoryURL = urls[0]
+                directoryURL = urls[0]
             }
-                fileName = "\(operationId).pdf"
+            fileName = "\(operationId).pdf"
             if directoryURL != nil {
                 finalPath = directoryURL?.appendingPathComponent(fileName!)
                 return (finalPath!, [.createIntermediateDirectories, .removePreviousFile])
@@ -318,7 +307,6 @@ import Foundation
     }
     
     //MARK: - Point list
-    
     @objc public func getCashierPoints(userId: NSNumber? = nil, count: NSNumber? = 99999999, page: NSNumber? = 1, onSuccess: (([QRPoint]) -> Void)? = nil, onError: ((NSError) -> Void)? = nil) {
         
         var parameters: [String: Any] = [:]
@@ -359,7 +347,6 @@ import Foundation
     }
     
     //MARK: - Push
-    
     @objc public func registerPush(token: String, onSuccess: (() -> Void)? = nil, onError: ((NSError) -> Void)? = nil) {
         let parameters: [String: Any] = [
             "token": token
@@ -400,4 +387,3 @@ import Foundation
         debugPrint(responseJSON)
     }
 }
-

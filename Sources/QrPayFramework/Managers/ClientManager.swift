@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  ClientManager.swift
 //  QRPayFramework
 //
 //  Created by Wooppay on 16.10.2017.
@@ -16,14 +16,12 @@ import UIKit
         didSet {
             Router.authToken = authToken
         }
-        
     }
     
     var clientPhone = "" {
         didSet {
             Router.clientPhone = clientPhone
         }
-        
     }
     
     var partnerLogin = "" {
@@ -35,7 +33,7 @@ import UIKit
     private let manager: SessionManager = {
         let configuration = URLSessionConfiguration.default
         configuration.httpAdditionalHeaders = SessionManager.defaultHTTPHeaders
-        let m = SessionManager.default//SessionManager(configuration: configuration)
+        let m = SessionManager.default
         return m
     }()
     
@@ -43,11 +41,9 @@ import UIKit
         didSet {
             Router.baseUrl = baseUrl
         }
-        
     }
     
     //MARK: - Init
-    
     @objc public override init() {}
     
     @objc open class var sharedInstance: ClientManager {
@@ -57,24 +53,23 @@ import UIKit
         return Singleton.instance
     }
     
-    
     @objc public init(authToken: String) {
         self.authToken = authToken
-        self.baseUrl = URL_BASE//(mode == .release) ? URL_BASE_RELEASE : URL_BASE_DEBUG
+        self.baseUrl = URL_BASE
         Router.baseUrl = baseUrl
         Router.authToken = authToken
     }
     
     @objc public init(clientPhone: String) {
         self.clientPhone = clientPhone
-        self.baseUrl = URL_BASE//(mode == .release) ? URL_BASE_RELEASE : URL_BASE_DEBUG
+        self.baseUrl = URL_BASE
         Router.baseUrl = baseUrl
         Router.clientPhone = clientPhone
     }
     
     @objc public init(authToken: String, clientPhone: String) {
         self.clientPhone = clientPhone
-        self.baseUrl = URL_BASE//(mode == .release) ? URL_BASE_RELEASE : URL_BASE_DEBUG
+        self.baseUrl = URL_BASE
         Router.baseUrl = baseUrl
         Router.clientPhone = clientPhone
         self.authToken = authToken
@@ -85,7 +80,7 @@ import UIKit
         self.partnerLogin = partnerLogin
         Router.partnerLogin = partnerLogin
         self.authToken = authToken
-        self.baseUrl = URL_BASE//(mode == .release) ? URL_BASE_RELEASE : URL_BASE_DEBUG
+        self.baseUrl = URL_BASE
         Router.baseUrl = baseUrl
         Router.authToken = authToken
     }
@@ -94,7 +89,7 @@ import UIKit
         self.partnerLogin = partnerLogin
         Router.partnerLogin = partnerLogin
         self.clientPhone = clientPhone
-        self.baseUrl = URL_BASE//(mode == .release) ? URL_BASE_RELEASE : URL_BASE_DEBUG
+        self.baseUrl = URL_BASE
         Router.baseUrl = baseUrl
         Router.clientPhone = clientPhone
     }
@@ -103,7 +98,7 @@ import UIKit
         self.partnerLogin = partnerLogin
         Router.partnerLogin = partnerLogin
         self.clientPhone = clientPhone
-        self.baseUrl = URL_BASE//(mode == .release) ? URL_BASE_RELEASE : URL_BASE_DEBUG
+        self.baseUrl = URL_BASE
         Router.baseUrl = baseUrl
         Router.clientPhone = clientPhone
         self.authToken = authToken
@@ -111,7 +106,6 @@ import UIKit
     }
     
     //MARK: - Login
-    
     @objc open func clientLogin(login: String, partnerLogin: String? = "partner_c", onSuccess: (() -> Void)? = nil, onError: ((NSError) -> Void)? = nil) {
         var parameters: [String: Any] = [
             "login": login
@@ -235,8 +229,7 @@ import UIKit
         
     }
     
-        //MARK: - Payment
-    
+    //MARK: - Payment
     @objc open func getFields(qrCode: String?, onSuccess: ((Service) -> Void)? = nil, onError: ((NSError) -> Void)? = nil) {
         var fields: [String: Any] = [:]
         fields["qr_code"] = qrCode
@@ -296,7 +289,7 @@ import UIKit
         fieldsData["payment_type"] = paymentType
         if cardId != nil {
             fieldsData["card_id"] = cardId
-         }
+        }
         
         request(Router.pay(fieldsData)).responseJSON(completionHandler: { (response) in
             self.debugPrintResponse(response: response)
@@ -358,12 +351,11 @@ import UIKit
     
     
     //MARK: - History
-    
     @objc open func getHistory(count: NSNumber? = 99999999, page: NSNumber? = 1, onSuccess: (([History]) -> Void)? = nil, onError: ((NSError) -> Void)? = nil) {
         
         var parameters: [String: Any] = [:]
-                parameters["per-page"] = count
-                parameters["page"] = page
+        parameters["per-page"] = count
+        parameters["page"] = page
         manager.request(Router.getClientHistory(parameters)).responseJSON { (response) in
             self.debugPrintResponse(response: response)
             switch response.result {
@@ -402,15 +394,6 @@ import UIKit
     }
     
     @objc open func saveCheckListFromHistory(operationId: Int, onSuccess: ((URL, String) -> Void)? = nil, onError: ((NSError) -> Void)? = nil) {
-//        let url = URL(string: "\(URL_BASE)history/receipt?id=\(operationId)")!
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "GET"
-//        request.setValue(authToken, forHTTPHeaderField: "Authorization")
-//        request.setValue(self.partnerLogin, forHTTPHeaderField: "partner-login")
-//        request.setValue(self.clientPhone, forHTTPHeaderField: "client-phone")
-//        request.setValue("4", forHTTPHeaderField: "Version")
-//        request.setValue("ru", forHTTPHeaderField: "language")
-        
         var fileName: String?
         var finalPath: URL?
         
@@ -430,7 +413,7 @@ import UIKit
         }).responseJSON { response in
             
             
-             let error = NSError(domain: "com.wooppay", code: -1, userInfo: [NSLocalizedDescriptionKey: "Во время сохранения файла произошла ошибка"])
+            let error = NSError(domain: "com.wooppay", code: -1, userInfo: [NSLocalizedDescriptionKey: "Во время сохранения файла произошла ошибка"])
             let statusCode = response.response?.statusCode ?? 200
             if statusCode >= 200 && statusCode <= 300 {
                 if let finalPath = finalPath {
@@ -449,18 +432,16 @@ import UIKit
                 if let finalPath = finalPath {
                     onSuccess?(finalPath, fileName ?? "qr")
                 } else {
-                   
+                    
                     onError?(error)
                 }
             }, onError: { (error) in
                 onError?(error)
             })
-            
         }
     }
     
     //MARK: - Card
-    
     @objc open func getLinkedCards(onSuccess: (([Card]) -> Void)? = nil, onError: ((NSError) -> Void)? = nil) {
         
         let parameters: [String: Any] = [:]
@@ -468,15 +449,15 @@ import UIKit
             self.debugPrintResponse(response: response)
             switch response.result {
             case .success:
-                    guard let statusCode = response.response?.statusCode else { return }
-                    guard let value = response.result.value else { return }
-                    ResponseHelper().checkResponse(statusCode: statusCode, value: value, onSuccess: {
-                        if let data = Mapper<Card>().mapArray(JSONObject: value as? [[String: Any]]) {
-                            onSuccess?(data)
-                        }
-                    }, onError: { (error) in
-                        onError?(error)
-                    })
+                guard let statusCode = response.response?.statusCode else { return }
+                guard let value = response.result.value else { return }
+                ResponseHelper().checkResponse(statusCode: statusCode, value: value, onSuccess: {
+                    if let data = Mapper<Card>().mapArray(JSONObject: value as? [[String: Any]]) {
+                        onSuccess?(data)
+                    }
+                }, onError: { (error) in
+                    onError?(error)
+                })
             case .failure(let error):
                 guard let statusCode = response.response?.statusCode else {
                     onError?(ErrorResponse(error: error as NSError).getError())
@@ -539,8 +520,6 @@ import UIKit
         }
     }
     
-    
-    
     @objc open func getServiceName(qrCode: String?, onSuccess: ((String) -> Void)? = nil, onError: ((NSError) -> Void)? = nil) {
         var fields: [String: Any] = [:]
         fields["qr_code"] = qrCode
@@ -574,7 +553,6 @@ import UIKit
             }
         })
     }
-    
     
     func debugPrintResponse(response: DataResponse<Any>) {
         debugPrint(response.request?.url?.absoluteString ?? "")
