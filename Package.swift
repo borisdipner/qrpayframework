@@ -21,7 +21,7 @@ let package = Package(
             dependencies: [],
             path: "Sources/",
             resources: [
-                .process("Resources")
+                .process("QrPayFramework/Resources")
             ]),
         .testTarget(
             name: "QrPayFrameworkTests",
